@@ -12,10 +12,13 @@ import {
   Play,
   ShieldAlert,
   SkipForward,
-  Thermometer, Video,
+  Thermometer,
+  Unlock,
+  Video,
   Wind,
   Zap
 } from 'lucide-react';
+import { useDashboard } from '../context/DashboardContext';
 
 // --- EXISTING COMPONENTS ---
 
@@ -60,19 +63,54 @@ export const CameraFrontDoor = () => (
   </div>
 );
 
-export const LockFrontDoor = () => (
-  <div className="card">
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-      <h3>Front Door Lock</h3>
-      <Lock size={20} color="var(--accent)" />
+export const LockFrontDoor = () => {
+  const {
+    isFrontDoorLocked = true,
+    setIsFrontDoorLocked,
+    lastLockStatusText = 'Locked • 5 mins ago',
+    setLastLockStatusText,
+  } = useDashboard() || {};
+
+  const handleLock = () => {
+    setIsFrontDoorLocked?.(true);
+    setLastLockStatusText?.('Locked • Just now');
+  };
+
+  const handleUnlock = () => {
+    setIsFrontDoorLocked?.(false);
+    setLastLockStatusText?.('Unlocked • Just now');
+  };
+
+  return (
+    <div className="card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <h3>Front Door Lock</h3>
+        {isFrontDoorLocked ? (
+          <Lock size={20} color="#4ade80" />
+        ) : (
+          <Unlock size={20} color="#fbbf24" />
+        )}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <button
+          className={`glass-btn ${isFrontDoorLocked ? 'active' : ''}`}
+          style={{ justifyContent: 'center' }}
+          onClick={handleLock}
+        >
+          Lock
+        </button>
+        <button
+          className={`glass-btn ${!isFrontDoorLocked ? 'active' : ''}`}
+          style={{ justifyContent: 'center' }}
+          onClick={handleUnlock}
+        >
+          Unlock
+        </button>
+      </div>
+      <p style={{ marginTop: '16px', fontSize: '12px' }}>{lastLockStatusText}</p>
     </div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-      <button className="glass-btn" style={{ justifyContent: 'center' }}>Lock</button>
-      <button className="glass-btn active" style={{ justifyContent: 'center' }}>Unlock</button>
-    </div>
-    <p style={{ marginTop: '16px', fontSize: '12px' }}>Last unlocked: 5 mins ago</p>
-  </div>
-);
+  );
+};
 
 export const SmartLightsLivingRoom = () => (
   <div className="card">

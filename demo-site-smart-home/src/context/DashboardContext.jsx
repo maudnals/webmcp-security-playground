@@ -11,9 +11,18 @@ export const DashboardContext = createContext();
 export function DashboardProvider({ children }) {
   const [dashboardComponents, setDashboardComponents] = useState([
     'weather_widget',
+    'lock_front_door',
   ]);
 
   const [isAgentActive, setIsAgentActive] = useState(false);
+  const [isFrontDoorLocked, setIsFrontDoorLocked] = useState(true);
+  const [lastLockStatusText, setLastLockStatusText] = useState('Locked • 5 mins ago');
+
+  const ensureLockWidgetVisible = () => {
+    setDashboardComponents((prev) =>
+      prev.includes('lock_front_door') ? prev : ['lock_front_door', ...prev]
+    );
+  };
 
   useWebMCP({
     name: "rearrangeDOMComponents",
@@ -29,6 +38,10 @@ export function DashboardProvider({ children }) {
       },
       required: ["componentIds"]
     },
+    annotations: {
+      readOnlyHint: false,
+      consequentialHint: false,
+    },
     execute: async (input) => {
       setIsAgentActive(true);
       setDashboardComponents(input.componentIds);
@@ -38,8 +51,61 @@ export function DashboardProvider({ children }) {
     }
   });
 
+  useWebMCP({
+    name: "lockFrontDoor",
+    description: "Locks the smart home front door lock to secure the house.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+    annotations: {
+      readOnlyHint: false,
+      consequentialHint: false,
+    },
+    execute: async () => {
+      setIsAgentActive(true);
+      setIsFrontDoorLocked(true);
+      setLastLockStatusText('Locked • Just now');
+      ensureLockWidgetVisible();
+
+      setTimeout(() => setIsAgentActive(false), 2000);
+      return "Front door locked successfully.";
+    },
+  });
+
+  useWebMCP({
+    name: "unlockFrontDoor",
+    description: "Unlocks the smart home front door lock. Grants physical access to the home.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+    annotations: {
+      readOnlyHint: false,
+      consequentialHint: true,
+    },
+    execute: async () => {
+      setIsAgentActive(true);
+      setIsFrontDoorLocked(false);
+      setLastLockStatusText('Unlocked • Just now');
+      ensureLockWidgetVisible();
+
+      setTimeout(() => setIsAgentActive(false), 2000);
+      return "Front door unlocked successfully.";
+    },
+  });
+
   return (
-    <DashboardContext.Provider value={{ dashboardComponents, isAgentActive }}>
+    <DashboardContext.Provider
+      value={{
+        dashboardComponents,
+        isAgentActive,
+        isFrontDoorLocked,
+        setIsFrontDoorLocked,
+        lastLockStatusText,
+        setLastLockStatusText,
+      }}
+    >
       {children}
     </DashboardContext.Provider>
   );
