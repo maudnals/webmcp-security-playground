@@ -50,4 +50,10 @@ export const MediaPage = () => (
   </PageLayout>
 );
 
+export const GuestbookPage = () => (
+  <PageLayout title="Guest Message Board">
+    {React.createElement(COMPONENT_MAP['guest_message_board'], { expanded: true })}
+  </PageLayout>
+);
+
 

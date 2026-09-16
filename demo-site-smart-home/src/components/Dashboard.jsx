@@ -37,7 +37,7 @@ export function Dashboard() {
             }}
           >
             <span className="animate-spin" style={{ fontSize: '20px' }}>⚙️</span> 
-            Updating dashboard components...
+            Agent is working...
           </motion.div>
         )}
       </AnimatePresence>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Activity, LayoutDashboard, Music, Shield, Thermometer } from 'lucide-react';
+import { Activity, LayoutDashboard, MessageSquare, Music, Shield, Thermometer } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 export function Sidebar() {
@@ -28,6 +28,9 @@ export function Sidebar() {
         </NavLink>
         <NavLink to="/media" className={({isActive}) => `glass-btn ${isActive ? 'active' : ''}`}>
           <Music size={18} /> Media
+        </NavLink>
+        <NavLink to="/guestbook" className={({isActive}) => `glass-btn ${isActive ? 'active' : ''}`}>
+          <MessageSquare size={18} /> Guest Board
         </NavLink>
       </nav>
     </div>
