@@ -31,7 +31,7 @@ export const WeatherWidget = () => (
   <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
     <CloudRain size={40} color="var(--accent)" />
     <div>
-      <h3 style={{ fontSize: '24px', marginBottom: '4px' }}>72°F</h3>
+      <h3 style={{ fontSize: '24px', marginBottom: '4px' }}>24°C</h3>
       <p>Cloudy • 20% Precipitation</p>
     </div>
   </div>
@@ -45,10 +45,10 @@ export const ThermostatControl = () => (
     </div>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <button className="glass-btn">-</button>
-      <span style={{ fontSize: '36px', fontWeight: '600' }}>74°</span>
+      <span style={{ fontSize: '36px', fontWeight: '600' }}>20°</span>
       <button className="glass-btn">+</button>
     </div>
-    <p style={{ textAlign: 'center', marginTop: '12px', color: 'var(--accent)' }}>Cooling to 72°</p>
+    <p style={{ textAlign: 'center', marginTop: '12px', color: 'var(--accent)' }}>Cooling to 19°</p>
   </div>
 );
 
@@ -88,12 +88,33 @@ export const LockFrontDoor = () => {
 
   return (
     <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h3>Front Door Lock</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3>Front Door Lock</h3>
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '999px',
+              fontFamily: 'monospace',
+              background: isFrontDoorLocked ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+              color: isFrontDoorLocked ? '#4ade80' : '#f87171',
+              border: `1px solid ${
+                isFrontDoorLocked ? 'rgba(74, 222, 128, 0.4)' : 'rgba(239, 68, 68, 0.35)'
+              }`,
+            }}
+          >
+            {isFrontDoorLocked ? 'LOCKED' : 'UNLOCKED'}
+          </span>
+        </div>
         {isFrontDoorLocked ? (
-          <Lock size={20} color="#4ade80" />
+          <Lock size={24} color="#4ade80" />
         ) : (
-          <Unlock size={20} color="#fbbf24" />
+          <Unlock
+            size={24}
+            color="#f87171"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(248, 113, 113, 0.6))' }}
+          />
         )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -117,46 +138,225 @@ export const LockFrontDoor = () => {
   );
 };
 
-export const SmartLightsLivingRoom = () => (
-  <div className="card">
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-      <h3>Living Room Lights</h3>
-      <Lightbulb size={20} color="var(--accent)" />
+export const SmartLightsLivingRoom = () => {
+  const { lightsPower = 'off', lightsBrightness = 0, setLivingRoomLightsState } = useDashboard() || {};
+  const isOn = lightsPower === 'on' && lightsBrightness > 0;
+
+  return (
+    <div
+      className="card"
+      style={{
+        position: 'relative',
+        transition: 'all 0.35s ease',
+        background: isOn
+          ? `radial-gradient(circle at top right, rgba(250, 204, 21, ${0.12 + (lightsBrightness / 100) * 0.18}), rgba(15, 23, 42, 0.85))`
+          : '#05070b',
+        borderColor: isOn ? 'rgba(250, 204, 21, 0.5)' : 'rgba(255, 255, 255, 0.08)',
+        boxShadow: isOn
+          ? `0 0 ${Math.round(lightsBrightness * 0.35)}px rgba(250, 204, 21, 0.25)`
+          : 'inset 0 0 30px rgba(0, 0, 0, 0.9)',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3>Living Room Lights</h3>
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '2px 8px',
+              borderRadius: '999px',
+              fontFamily: 'monospace',
+              background: isOn ? 'rgba(250, 204, 21, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+              color: isOn ? '#fde047' : '#f87171',
+              border: `1px solid ${isOn ? 'rgba(250, 204, 21, 0.4)' : 'rgba(239, 68, 68, 0.35)'}`,
+            }}
+          >
+            {isOn ? `ON` : 'OFF'}
+          </span>
+        </div>
+        <Lightbulb
+          size={24}
+          color={isOn ? '#fde047' : '#475569'}
+          style={{
+            filter: isOn ? 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.9))' : 'none',
+            transition: 'all 0.3s ease',
+          }}
+        />
+      </div>
+
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '14px' }}>
+        <button
+          className={`glass-btn ${isOn ? 'active' : ''}`}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            borderColor: isOn ? '#fde047' : undefined,
+            color: isOn ? '#fde047' : undefined,
+          }}
+          onClick={() => setLivingRoomLightsState?.('on', lightsBrightness > 0 ? lightsBrightness : 80)}
+        >
+          ON
+        </button>
+        <button
+          className={`glass-btn ${!isOn ? 'active' : ''}`}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            borderColor: !isOn ? '#f87171' : undefined,
+            color: !isOn ? '#f87171' : undefined,
+          }}
+          onClick={() => setLivingRoomLightsState?.('off', 0)}
+        >
+          OFF
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', minWidth: '72px' }}>
+          Brightness:
+        </span>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={isOn ? lightsBrightness : 0}
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            setLivingRoomLightsState?.(val === 0 ? 'off' : 'on', val);
+          }}
+          style={{ flex: 1, accentColor: '#fde047', cursor: 'pointer' }}
+        />
+        <span style={{ fontSize: '12px', fontFamily: 'monospace', width: '36px', textAlign: 'right' }}>
+          {isOn ? `${lightsBrightness}%` : '0%'}
+        </span>
+      </div>
     </div>
-    <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-      <button className="glass-btn active">ON</button>
-      <button className="glass-btn">OFF</button>
-    </div>
-    <p style={{ fontSize: '12px' }}>Brightness: 80%</p>
-  </div>
-);
+  );
+};
 
 // --- NEW COMPONENTS ---
 
-export const MediaPlayerWidget = () => (
-  <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3))', zIndex: 0 }}></div>
-    <div style={{ position: 'relative', zIndex: 1 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <h3>Sonos • Living Room</h3>
-        <Music size={20} color="var(--accent)" />
+export const MediaPlayerWidget = () => {
+  const {
+    playlistTracks = [],
+    deletePlaylistTrack,
+    resetPlaylistTracks,
+  } = useDashboard() || {};
+
+  const currentTrack = playlistTracks[0] || {
+    title: 'Queue Empty',
+    artist: 'Add a track below',
+  };
+
+  return (
+    <div className="card" style={{ position: 'relative', overflow: 'hidden', gridColumn: 'span 2' }}>
+      <div className="dev-inline-badge dev-inline-badge--corner">
+        💀 Untrusted playlist metadata
       </div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '16px' }}>
-        <div style={{ width: '60px', height: '60px', background: 'var(--accent-glow)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Music size={24} color="var(--accent)" />
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Music size={20} color="var(--accent)" />
+            <h3 style={{ margin: 0 }}>Soniq • Collaborative Party Queue</h3>
+          </div>
+          <button
+            className="glass-btn"
+            style={{ fontSize: '11px', padding: '4px 8px' }}
+            onClick={() => resetPlaylistTracks?.()}
+            title="Reset default party queue"
+          >
+            <RotateCcw size={12} /> Reset Queue
+          </button>
         </div>
-        <div>
-          <h4 style={{ margin: 0, fontSize: '16px' }}>Neon Nights</h4>
-          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>Synthwave Essentials</p>
+
+        {/* Now Playing Header */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '14px',
+            alignItems: 'center',
+            padding: '10px 12px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: '8px',
+            marginBottom: '14px',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              background: 'var(--accent-glow)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Music size={22} color="var(--accent)" />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '11px', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Now Playing • Living Room
+            </div>
+            <h4 style={{ margin: '2px 0', fontSize: '15px' }}>{currentTrack.title}</h4>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>{currentTrack.artist}</p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button className="glass-btn" style={{ padding: '6px 10px' }}><Play size={14} /></button>
+            <button className="glass-btn" style={{ padding: '6px 10px' }}><SkipForward size={14} /></button>
+          </div>
         </div>
-      </div>
-      <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-        <button className="glass-btn"><Play size={16} /></button>
-        <button className="glass-btn"><SkipForward size={16} /></button>
+
+        {/* Track Queue List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
+          {playlistTracks.map((track, idx) => (
+            <div
+              key={track.id}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 10px',
+                borderRadius: '6px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                position: "relative"
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flex: 1 }}>
+                <span style={{ fontSize: '12px', fontFamily: 'monospace', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                  #{idx + 1}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 500 }}>{track.title}</span>
+                    {track.isPoisoned && (
+                      <span className="dev-inline-badge dev-inline-badge--track">
+                        💀 Prompt injection payload
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', wordBreak: 'break-word' }}>
+                    {track.artist}
+                  </div>
+                </div>
+              </div>
+              <button
+                className="glass-btn"
+                style={{ padding: '4px 6px', marginLeft: '8px', opacity: 0.7 }}
+                onClick={() => deletePlaylistTrack?.(track.id)}
+                title="Remove track"
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const AlarmPanelWidget = () => (
   <div className="card" style={{ borderColor: 'rgba(255, 0, 0, 0.2)' }}>
@@ -187,26 +387,6 @@ export const AirQualityWidget = () => (
     <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
       <span>PM2.5: 3.1 µg/m³</span>
       <span>VOC: 0.02 ppm</span>
-    </div>
-  </div>
-);
-
-export const RobotVacuumWidget = () => (
-  <div className="card">
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-      <h3>Roborock S7</h3>
-      <Cpu size={20} color="var(--accent)" />
-    </div>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-      <div>
-        <span style={{ fontSize: '18px', fontWeight: '500' }}>Docked</span>
-        <p style={{ fontSize: '12px', color: '#4ade80', marginTop: '4px' }}>100% Charged</p>
-      </div>
-      <Battery size={32} color="#4ade80" />
-    </div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-      <button className="glass-btn active" style={{ justifyContent: 'center' }}>Clean</button>
-      <button className="glass-btn" style={{ justifyContent: 'center' }}>Dock</button>
     </div>
   </div>
 );
@@ -263,6 +443,8 @@ export const GuestMessageBoardWidget = ({ expanded = false }) => {
     <div
       className="card"
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         gridColumn: expanded ? '1 / -1' : 'span 2',
         display: 'flex',
         flexDirection: 'column',
@@ -273,37 +455,9 @@ export const GuestMessageBoardWidget = ({ expanded = false }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <MessageSquare size={20} color="var(--accent)" />
           <h3 style={{ margin: 0 }}>Digital Guest Message Board</h3>
-          <span
-            style={{
-              fontSize: '11px',
-              background: 'rgba(251, 191, 36, 0.15)',
-              color: '#fbbf24',
-              border: '1px solid rgba(251, 191, 36, 0.3)',
-              padding: '2px 8px',
-              borderRadius: '999px',
-            }}
-          >
-            ⚠️ Untrusted Guest Content
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            type="button"
-            className="glass-btn"
-            style={{ padding: '6px 12px', fontSize: '12px' }}
-            onClick={() => setIsAdding(!isAdding)}
-          >
-            <Plus size={14} /> {isAdding ? 'Cancel' : 'Leave a Note'}
-          </button>
-          <button
-            type="button"
-            className="glass-btn"
-            style={{ padding: '6px 12px', fontSize: '12px' }}
-            onClick={() => resetGuestMessages?.()}
-            title="Reset demo notes"
-          >
-            <RotateCcw size={14} /> Reset Notes
-          </button>
+          <div className="dev-inline-badge dev-inline-badge--corner">
+            💀 Untrusted guest content
+          </div>
         </div>
       </div>
 
@@ -376,7 +530,7 @@ export const GuestMessageBoardWidget = ({ expanded = false }) => {
           <div
             key={msg.id}
             style={{
-              background: msg.color || '#fef08a',
+              background: '#b6fbff',
               color: '#1e293b',
               borderRadius: '4px 4px 14px 4px',
               padding: '18px 16px 14px 16px',
@@ -389,6 +543,11 @@ export const GuestMessageBoardWidget = ({ expanded = false }) => {
               minHeight: '155px',
             }}
           >
+            {msg.isPoisoned && (
+              <div className="dev-inline-badge dev-inline-badge--track">
+                💀 Prompt injection payload
+              </div>
+            )}
 
             <p
               style={{
@@ -452,7 +611,6 @@ export const COMPONENT_MAP = {
   'media_player_living_room': MediaPlayerWidget,
   'alarm_panel': AlarmPanelWidget,
   'air_quality_sensor': AirQualityWidget,
-  'robot_vacuum': RobotVacuumWidget,
   'solar_grid': SolarGridWidget,
   'energy_summary': SolarGridWidget,
 };
