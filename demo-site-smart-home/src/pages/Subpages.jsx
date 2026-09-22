@@ -37,7 +37,7 @@ export const ClimatePage = () => (
 );
 
 export const EnergyPage = () => (
-  <PageLayout title="Energy Grid">
+  <PageLayout title="Energy">
     {React.createElement(COMPONENT_MAP['solar_grid'])}
   </PageLayout>
 );
@@ -45,7 +45,11 @@ export const EnergyPage = () => (
 export const MediaPage = () => (
   <PageLayout title="Media & Appliances">
     {React.createElement(COMPONENT_MAP['media_player_living_room'])}
-    {React.createElement(COMPONENT_MAP['robot_vacuum'])}
+  </PageLayout>
+);
+
+export const LightsPage = () => (
+  <PageLayout title="Lighting">
     {React.createElement(COMPONENT_MAP['smart_lights_living_room'])}
   </PageLayout>
 );
